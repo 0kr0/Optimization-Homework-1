@@ -45,20 +45,20 @@ public class Main {
         }
 
         // solution
-        double[][] simplexTable = new double[m + 1][n + m + 1];
+        double[][] simplexTable = new double[m + 1][n + m + 1]; // main body of table
         int[] basicVariables = new int[m]; // array for basis variables
         for (int i = 0; i < m + 1; i++) {
             if (i == 0) {
-                for (int j = 0; j < n; j++) simplexTable[i][j] = -C[j]; // coeffs in objective
+                for (int j = 0; j < n; j++) simplexTable[i][j] = -C[j]; // coefficients in objective
             } else {
-                for (int j = 0; j < n; j++) simplexTable[i][j] = A[i - 1][j]; // coeffs of constraints
+                for (int j = 0; j < n; j++) simplexTable[i][j] = A[i - 1][j]; // coefficients of constraints
                 simplexTable[i][n + i - 1] = 1; // Slack variable
                 simplexTable[i][n + m] = b[i - 1]; // RHS
-                basicVariables[i - 1] = n + i - 1; // keep track of basis variables
+                basicVariables[i - 1] = n + i - 1; // tracking basis variables
             }
         }
 
-        while (!isOptimal(simplexTable, n)) {
+        while (!isOptimal(simplexTable, n)) { // finding key column and row
             int keyColumn = -1;
             double minValue = 0;
             for (int i = 0; i < n; i++) {
@@ -76,7 +76,7 @@ public class Main {
                     keyRow = i;
                 }
             }
-            if (keyRow == -1) {
+            if (keyRow == -1) { // if solution is unbounded
                 System.out.println("The method is not applicable!");
                 return;
             }
@@ -95,25 +95,22 @@ public class Main {
                 }
             }
 
-            // updating the basis variables
+            // Updating basis variables
             basicVariables[keyRow - 1] = keyColumn;
         }
 
-        double[] x = new double[n]; // Solution vector must be length of n
+        double[] x = new double[n]; // Vector of solutions should have size n
         for (int i = 0; i < m; i++) {
-            if (basicVariables[i] < n) { // If it is variable from objective function(not slack variable)
+            if (basicVariables[i] < n) { // If it is not slack variable
                 x[basicVariables[i]] = simplexTable[i + 1][n + m];
             }
         }
         double value = simplexTable[0][n + m];
-
-        // output
+// output
         System.out.println("The vector of decision variables:");
-
         for (int i = 0; i < n; i++) {
-            System.out.print("x" + (i+1) + "=" + String.format("%." + accuracy + "f", x[i]) + " ");
+            System.out.print(String.format("%." + accuracy + "f", x[i]) + " ");
         }
-
         System.out.println();
         System.out.println("The value of the objective function:");
         System.out.println(String.format("%." + accuracy + "f", value));
@@ -133,5 +130,3 @@ public class Main {
         return true;
     }
 }
-
-
